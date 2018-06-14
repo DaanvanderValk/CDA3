@@ -7,21 +7,19 @@ Created on Thu Jun 14 10:55:31 2018
 from queue import PriorityQueue
 import numpy as np
 
+# Input: two lists of tuples (which should be ordered beforehand)
 def compute_top_10_error(real, estimation):
     error = 0
     for i in range(10):
-        current_ip = estimation[i]
-        if real[i] == current_ip:
+        current_ip = estimation[i][1]
+        if real[i][1] == current_ip:
             continue
         
         for j in range(len(real)):
-            if real[j] == current_ip:
+            if real[j][1] == current_ip:
                 print(i, "Found IP address {} {} places away: adding {} to error.".format(current_ip, np.abs(j - i), np.minimum(10, np.abs(j - i)) * (10 - i)))
                 error += np.minimum(10, np.abs(j - i)) * (10 - i)
                 break
-        
-        #print("Found IP address {} nowhere in real data: adding {} to error.".format(current_ip, len(real) * (len(estimation) - i)))
-        #error += len(real) * (len(estimation) - i)
                 
     return error
 
@@ -36,7 +34,7 @@ if __name__ == "__main__":
     # We only considered the infected host, as indicated here:
     # https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-47/
     infected_host_addr = '147.32.84.165'
-    reservoir_size = 5900
+    reservoir_size = 1000
     
     reservoir = PriorityQueue()
     for _ in range(reservoir_size):
@@ -113,32 +111,24 @@ if __name__ == "__main__":
     
     
     # COUNTING EXACT OCCURANCES
-    ip_freqs_real = sorted(ip_dict.values())[::-1] # Frequencies of IPs, ordered from high to low
-    ip_sorted_real = sorted(ip_dict, key=ip_dict.__getitem__)[::-1] # IPs, ordered in the frequencies from high to low
+    ip_frequencies_real = sorted([tuple(reversed(x)) for x in ip_dict.items()])[::-1]
     
-    print("Real data: 20 most observed IP addresses with their frequencies:")
-    for i in range(10):
-        print(ip_sorted_real[i], ":", ip_freqs_real[i])
-        
-        
     # COUNTING USING THE RESERVOIR
     reservoir_dict = {}
     for i in range(reservoir_size):
         countIP(reservoir_dict, reservoir.get()[1])
-    
-    ip_freqs_reservoir = sorted(reservoir_dict.values())[::-1] # Frequencies of IPs, ordered from high to low
-    ip_sorted_reservoir = sorted(reservoir_dict, key=reservoir_dict.__getitem__)[::-1] # IPs, ordered in the frequencies from high to low
-    
-    print("\nReservoir: 20 most observed IP addresses with their frequencies:")
-    for i in range(10):
-        print(ip_sorted_reservoir[i], ":", ip_freqs_reservoir[i])
-    
-    
-    print("Error between the two sets:", compute_top_10_error(ip_sorted_real, ip_sorted_reservoir[0:10]))
-    print("Error between the two sets:", compute_top_10_error(ip_sorted_real, ip_sorted_reservoir))
-    
-    
-    
-    ip_frequencies_real = sorted([tuple(reversed(x)) for x in ip_dict.items()])[::-1]
     ip_frequencies_reservoir = sorted([tuple(reversed(x)) for x in reservoir_dict.items()])[::-1]
-    print(ip_thingy)
+    
+    
+    
+    print("\nReal data: most observed IP addresses with their frequencies:")
+    for i in range(10):
+        print("{}: {} occurances".format(ip_frequencies_real[i][1], ip_frequencies_real[i][0]))
+    
+    
+    print("\nReservoir: most observed IP addresses with their frequencies:")
+    for i in range(10):
+        print("{}: {} occurances".format(ip_frequencies_reservoir[i][1], ip_frequencies_reservoir[i][0]))
+        
+    
+    print("Error of the top 10 (minimal: 0, maximal: 550):", compute_top_10_error(ip_frequencies_real, ip_frequencies_reservoir))
