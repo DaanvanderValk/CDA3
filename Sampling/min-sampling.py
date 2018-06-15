@@ -82,9 +82,7 @@ if __name__ == "__main__":
             ip = source_ip
             
         # Do normal count, to evaluate results
-        # countIP(ip_dict, ip)
-        countIP(ip_dict, source_ip)
-        countIP(ip_dict, dest_ip)
+        countIP(ip_dict, ip)
         
         
         # Create random number and add into the tuple when desired
