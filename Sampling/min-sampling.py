@@ -31,7 +31,7 @@ def countIP(ip_dict, ip_addr):
 
 if __name__ == "__main__":
     src = '../Data/capture20110816.pcap.netflow.labeled'
-    # We only considered the infected host, as indicated here:
+    # We only considered the infected host, as indicated here: (5877 flows)
     # https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-47/
     infected_host_addr = '147.32.84.165'
     reservoir_size = 1000
@@ -82,7 +82,9 @@ if __name__ == "__main__":
             ip = source_ip
             
         # Do normal count, to evaluate results
-        countIP(ip_dict, ip)
+        # countIP(ip_dict, ip)
+        countIP(ip_dict, source_ip)
+        countIP(ip_dict, dest_ip)
         
         
         # Create random number and add into the tuple when desired
