@@ -42,16 +42,6 @@ if __name__ == "__main__":
     
     ah = open(src, 'r')
     
-    ip_dict = {}
-    flow_durations = []
-    protocol_dict = {}
-    port_dict = {}
-    flags_dict = {}
-    tos_dict = {}
-    flow_packets = []
-    flow_bytes = []
-    label_dict = {}
-    text_label_dict = {}
     
     list_protocols = []
     list_flags = []
@@ -100,64 +90,16 @@ if __name__ == "__main__":
         source = line_array[4].split(':')
         dest = line_array[6].split(':')
         
-        # We are interested in the infected host: which addresses does it connect to?
-        # Skip lines that are not from/to this host
-#        if source[0] != infected_host_addr and dest[0] != infected_host_addr:
-#            continue
-        
-        
-#        # Let 'ip' store the value of the other host
-#        if source[0] == infected_host_addr:
-#            ip = dest[0]
-#        else:
-#            ip = source[0]
-#        
-#        increase_dict_counter(ip_dict, ip)
-#        
-#        
-#        if len(source) > 1:
-#            increase_dict_counter(port_dict, source[1])
-#        
-#        if len(dest) > 1:
-#            increase_dict_counter(port_dict, dest[1])
-#        
-#        
-#        
-#        # Append values of duration, packets and bytes to lists
-#        flow_durations.append(line_array[2])
-#        flow_packets.append(line_array[9])
-#        flow_bytes.append(line_array[10])
-#        
-#        # Count categorical occurances
-#        increase_dict_counter(protocol_dict, line_array[3])
-#        increase_dict_counter(flags_dict, line_array[7])
-#        increase_dict_counter(tos_dict, line_array[8])
-#        increase_dict_counter(label_dict, line_array[11])
-#        increase_dict_counter(text_label_dict, line_array[12])
-        
-        counter += 1
-
         # Append to lists, to be combined into dataframe
         list_protocols.append(line_array[3])
         list_flags.append(line_array[7])
         list_text_labels.append(line_array[12])
         
-        # If you want to limit how many lines you read, uncomment this:
-#        counter += 1
-#        if counter == 5:
-#            break
     
     print("Done reading data.")
     
-#    ip_frequencies = sorted([tuple(reversed(x)) for x in ip_dict.items()])[::-1]
-#    protocol_frequencies = sorted([tuple(reversed(x)) for x in protocol_dict.items()])[::-1]
-#    port_frequencies = sorted([tuple(reversed(x)) for x in port_dict.items()])[::-1]
-#    flags_frequencies = sorted([tuple(reversed(x)) for x in flags_dict.items()])[::-1]
-#    tos_frequencies = sorted([tuple(reversed(x)) for x in tos_dict.items()])[::-1]
-#    label_frequencies = sorted([tuple(reversed(x)) for x in label_dict.items()])[::-1]
-#    text_label_frequencies = sorted([tuple(reversed(x)) for x in text_label_dict.items()])[::-1]
-#    print("Done sorting data.")
     
+    # Create dataframe of the collected data
     df = pd.DataFrame({'protocol': list_protocols,
      'flags': list_flags,
      'label': list_text_labels
@@ -256,8 +198,8 @@ if __name__ == "__main__":
     # at the graph on a logarithmic scale. This is achieved by replacing each value in the
     # dataframe to log(1 + value). This maps the interval [0, <very high values>] to
     # [0, <relatively low value>], which is exactly what we want.
-    legitimate_pivot_log = legitimate_pivot #np.log(1 + legitimate_pivot)
-    botnet_pivot_log = botnet_pivot#np.log(1 + botnet_pivot)
+    legitimate_pivot_log = np.log(1 + legitimate_pivot)
+    botnet_pivot_log = np.log(1 + botnet_pivot)
 
     # legitimate - logarithmic scale
     plt.subplots(figsize=(x_size, y_size))
