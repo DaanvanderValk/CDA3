@@ -38,7 +38,8 @@ if __name__ == "__main__":
 #    https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-51/
     
     infected_host_addr = '147.32.84.165'
-    
+    #test_host_addr = ['147.32.84.191']
+    test_host_addr = '147.32.84.205'
     ah = open(src, 'r')
     
     # Possible flags:
@@ -74,10 +75,11 @@ if __name__ == "__main__":
     
     # Keep a list of the flow codes
     list_flow_codes = []
+    list_flow_codes_legitimate = []
     # Also keep a list of the further discretizated codes
     list_flow_codes_binned = []
-    
-    
+    list_flow_codes_binned_legitimate = []
+    list_flow_codes_binned_host1 = []
     code = 0
     # Compute the factor for each first iteration of the encoding algorithm (e.g., i=0)
     # This is equal to spaceSize / |M1|
@@ -108,15 +110,27 @@ if __name__ == "__main__":
         
         source_ip = line_array[4].split(':')[0]
         dest_ip = line_array[6].split(':')[0]
+        # Append to lists, to be combined into dataframe
+        protocol = line_array[3]
+        flags = line_array[7]
+        if (line_array[12].split(':')[0] == 'LEGITIMATE'):
+            code = discrete_protocols.index(protocol) * initialSpaceDevM1 + discrete_flags.index(flags)
+            list_flow_codes_legitimate.append(code)
         
+            # Discretize this encoding even further, into the number of bins defined before
+            list_flow_codes_binned_legitimate.append(np.floor(float(code)/space*number_of_bins))
+            
+        if (source_ip == test_host_addr or dest_ip == test_host_addr):
+            code = discrete_protocols.index(protocol) * initialSpaceDevM1 + discrete_flags.index(flags)
+            #list_flow_codes_legitimate.append(code)
+        
+            # Discretize this encoding even further, into the number of bins defined before
+            list_flow_codes_binned_host1.append(np.floor(float(code)/space*number_of_bins))
         # We are interested in the infected host: which addresses does it connect to?
         # Skip lines that are not from/to this host
         if source_ip != infected_host_addr and dest_ip != infected_host_addr:
             continue
         
-        # Append to lists, to be combined into dataframe
-        protocol = line_array[3]
-        flags = line_array[7]
         
         
         # Compute the encoding of this flow.
@@ -141,7 +155,21 @@ if __name__ == "__main__":
      'code': list_flow_codes, 
      'code_discretized': list_flow_codes_binned
     })
+    df.to_pickle("discretised_dataframe_infected_host")
+    # Create dataframe of the collected data of legitimate entries
+    df_legitimate = pd.DataFrame({
+     'code': list_flow_codes_legitimate, 
+     'code_discretized': list_flow_codes_binned_legitimate
+    })
+    df_legitimate.to_pickle("discretised_dataframe_legitimate")
     
+    df_host1 = pd.DataFrame({
+     'code_discretized': list_flow_codes_binned_host1
+    })
+    df_host1.to_pickle("discretised_dataframe_host1")
+    
+    #list_flow_codes_binned_host1
+'''    
     plt.figure()
     plt.suptitle("Flow codes")
     df['code'].plot(figsize=(14,5), color = "purple")
@@ -149,4 +177,4 @@ if __name__ == "__main__":
     plt.figure()
     plt.suptitle("Flow codes (discretized)")
     df['code_discretized'].plot(figsize=(14,5), color="blue")
-    
+'''    
