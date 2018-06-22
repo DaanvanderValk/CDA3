@@ -20,6 +20,28 @@ def generate_trigrams(data, dimensions):
         #convert to probabilities
     occurrences_prob = np.true_divide(occurrences, len(data))
     return occurrences_prob
+
+def generate_trigrams_30pct_sample(data, dimensions):
+    occurrences = np.zeros((dimensions,dimensions,dimensions))
+    sum = 0
+    
+    selected = 0
+    
+    for i in range(0,len(data)-3):
+        # Only select 30% of the sequences
+        if np.random.rand() > 0.3:
+            continue
+        
+        a = int(data[i])
+        b = int(data[i+1])
+        c = int(data[i+2])
+        occurrences[a][b][c] = occurrences[a][b][c] + 1
+        
+        selected +=1
+                
+        #convert to probabilities
+    occurrences_prob = np.true_divide(occurrences, selected)
+    return occurrences_prob
     
 def compute_ngram_difference(ngram1, ngram2,dimensions):
     differences = []
@@ -50,7 +72,8 @@ threegrams_infected = generate_trigrams(infected_df, dimensions)
 
 df = pd.read_pickle("../Discretization/discretised_dataframe_legitimate")
 legitimate_df = df['code_discretized']#.sample(n = int(0.4*df.shape[0]))
-threegrams_legitimate = generate_trigrams(legitimate_df, dimensions)
+# Only select 30% of the sequences (see 'Learning Behavioral Fingerprints From Netflows Using Timed Automata', p. 313)
+threegrams_legitimate = generate_trigrams_30pct_sample(legitimate_df, dimensions)
 
 differences = compute_ngram_difference(threegrams_infected, threegrams_legitimate,dimensions)
 #for i in range (0, 100):
