@@ -61,6 +61,17 @@ if __name__ == "__main__":
     # TCP, UDP, ICMP, PIM, RTP, ARP, IPX/SPX, RTCP, IGMP, IPV6-ICMP, IPV6, ESP, LLC, UDT
     
     
+    discrete_protocols = ['TCP', 'UDP', 'ICMP']
+    discrete_flags = ["FRPA_", "INT", "A_", "FPA_", "PA_", "URP", "_FSPA", "S_", "SPA_", "RA_", "FA_", "SRPA_", "R_",
+     "FSPA_", "RED", "SA_", "URN", "ECO", "_FSA", "FSRPA_", "URFIL", "URH", "FRA_", "CON", "FSA_",
+     "RPA_", "_FSRPA", "ECR", "FS_", "TXD", "SEC_", "SR_", "FSRA_", "F_", "URHPRO", "NNS", "SRA_", "SRC",
+     "_FSRA", "AC_", "NRA", "SPAC_", "PAC_", "FSAU_", "FSRPAC_", "URO", "FRPAC_", "RC_", "URNPRO",
+     "FSPAC_", "URF", "FPAC_", "FSR_", "_FSPAC", "FSPAEC_", "FAU_", "MAS", "TST", "IRR", "RTS", "RTA",
+     "IRQ", "UNK", "MSR", "TSR", "SEC", "ROB", "MRQ", "IAH", "DNQ", "PTB", "PAR", "WAY", "PHO", "___", "AHA",
+     "NRS", "MHR", "UR", "NNA", "MRP", "TRC", "DCE", "SKP", "DNP", "URPRE", "URS", "URNU", "URCUT",
+     "URISO", "URHTOS", "URHU", "FRAC_", "SRC_", "RPA_FRPA"]
+    
+    
     ah.readline()#skip first line
     counter = 0
     for line_ah in ah:
@@ -95,6 +106,11 @@ if __name__ == "__main__":
         list_flags.append(line_array[7])
         list_text_labels.append(line_array[12])
         
+        counter +=1
+        
+        if counter > 5:
+            break
+        
     
     print("Done reading data.")
     
@@ -104,6 +120,13 @@ if __name__ == "__main__":
      'flags': list_flags,
      'label': list_text_labels
     })
+    
+    
+    
+    
+    
+    
+    # VISUALIZATION
     
     # Dimensions of the heatmaps; useful for tweaking.
     x_size = 14
@@ -116,17 +139,6 @@ if __name__ == "__main__":
     
     # Save the heatmaps to SVG files?
     saveToFiles = False
-    
-    # txtvariantcode vs currencycode
-    
-    # Kerneldistributionfunction.py
-    # ScatterPlot.py
-
-#    print(df.keys())             # These are the features:
-#       'txid', 'bookingdate', 'issuercountrycode', 'txvariantcode', 'bin',
-#       'amount', 'currencycode', 'shoppercountrycode', 'shopperinteraction',
-#       'label', 'cardverificationcodesupplied', 'cvcresponsecode',
-#       'creationdate', 'accountcode', 'mail_id', 'ip_id', 'card_id'
     
     # If the heatmaps should be saved, use current datetime to avoid overwriting existing files
     preFileName = datetime.datetime.now().strftime("%d-%m-%y %H.%M.%S")
