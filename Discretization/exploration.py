@@ -108,8 +108,6 @@ if __name__ == "__main__":
         
         counter +=1
         
-        if counter > 5:
-            break
         
     
     print("Done reading data.")
@@ -129,7 +127,7 @@ if __name__ == "__main__":
     # VISUALIZATION
     
     # Dimensions of the heatmaps; useful for tweaking.
-    x_size = 14
+    x_size = 25
     y_size = 2
     
     # Select the features to be plotted here
@@ -138,11 +136,7 @@ if __name__ == "__main__":
     feature2 = 'flags'
     
     # Save the heatmaps to SVG files?
-    saveToFiles = False
-    
-    # If the heatmaps should be saved, use current datetime to avoid overwriting existing files
-    preFileName = datetime.datetime.now().strftime("%d-%m-%y %H.%M.%S")
-    
+    saveToFiles = True
     
     # Only select items we need
     df = df[['label', feature1, feature2]]
@@ -221,7 +215,7 @@ if __name__ == "__main__":
     ax_normal.set_xlabel(feature2)
     ax_normal.set_ylabel(feature1)
     if saveToFiles:
-        plt.savefig(preFileName + " - legitimate.svg", bbox_inches='tight')
+        plt.savefig("Heatmap_legitimate.svg", bbox_inches='tight')
 
     # botnetulent - logarithmic scale
     plt.subplots(figsize=(x_size, y_size))
@@ -231,7 +225,7 @@ if __name__ == "__main__":
     ax_normal.set_xlabel(feature2)
     ax_normal.set_ylabel(feature1)
     if saveToFiles:
-        plt.savefig(preFileName + " - botnet.svg", bbox_inches='tight')
+        plt.savefig("Heatmap_botnet.svg", bbox_inches='tight')
     
     # Differences - linear scale
     plt.subplots(figsize=(x_size, y_size))
@@ -242,6 +236,6 @@ if __name__ == "__main__":
     ax_normal.set_ylabel(feature1)
     
     if saveToFiles:
-        plt.savefig(preFileName + " - fraction.svg", bbox_inches='tight')
+        plt.savefig("Heatmap_fraction.svg", bbox_inches='tight')
     
     
