@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 14 11:21:25 2018
+Created on Sat Jun 23 13:40:24 2018
 
 @author: sande
 """
-#This code is to evaluate best height and width of count-min sketch matrix
+#once we find best height and best width frim count_min.py , we print the top ten ips as per count_min, and top 10 ips as per normal computation
+
 import numpy as np
 import hashlib
 
@@ -31,9 +32,8 @@ def compute_top_10_error(real, estimation):
     return error
 
 if __name__ == "__main__":
-    
-    h = [5,10,15,20,30,40]
-    w = [50,100,200,300,500,600,700]
+    h = [20]
+    w = [700]
     for height in h:
         for width in w:
             ip_dict = {}
@@ -49,6 +49,7 @@ if __name__ == "__main__":
             for line_ah in ah:
                 counter += 1
                 line_array = line_ah.strip().split()
+                #print (line_array)
                 source_ip = line_array[4].split(':')[0]
                 dest_ip = line_array[6].split(':')[0]
                 
@@ -77,7 +78,14 @@ if __name__ == "__main__":
                     hash_n = float.fromhex(hash1.hexdigest()) + (float(i) * float.fromhex(hash2.hexdigest())) 
                     # take modulus of the hashed value so that the entry corresponding to that column can be incremented
                     hex_int = int(hash_n) % width
+                    #print (hex_int)
                     sketch_matrix[i][hex_int] += 1
+                #if (counter == 10):
+                    #print (sketch_matrix)
+                    #break
+        
+#            print (sketch_matrix)
+#            print (sketch_matrix.shape)
             # COUNTING EXACT OCCURANCES
             ip_frequencies_real = sorted([tuple(reversed(x)) for x in ip_dict.items()])[::-1]
             ip_dict_hash = {}
@@ -96,6 +104,10 @@ if __name__ == "__main__":
 
             ip_frequencies_hash = sorted([tuple(reversed(x)) for x in ip_dict_hash.items()])[::-1]
             
-            print ("For height {} and width {}".format(height,width))
-            print("Error of the top 10 (minimal: 0, maximal: 550):", compute_top_10_error(ip_frequencies_real, ip_frequencies_hash))    
+            print ("Real values")
+            for i in range(10):
+                print("{}: {} occurances".format(ip_frequencies_real[i][1], ip_frequencies_real[i][0]))
+            print ("Hashed values")    
+            for i in range(10):    
+                print("{}: {} occurances".format(ip_frequencies_hash[i][1], ip_frequencies_hash[i][0]))
             
