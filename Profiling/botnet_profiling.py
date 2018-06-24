@@ -4,7 +4,8 @@ Created on Fri Jun 22 10:59:47 2018
 
 @author: sande
 """
-#Before executing this code, run 
+#Before executing this code, run discretization_for_ngrams.py file in Discretization file 
+#to obtain discretized dataframes for each host
 import numpy as np
 import pandas as pd
 import statistics
