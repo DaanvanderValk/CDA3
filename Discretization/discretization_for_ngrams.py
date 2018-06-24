@@ -44,13 +44,16 @@ if __name__ == "__main__":
     # to compute the threshold. These IP addresses have legitimate traffic.
     normalHosts = ["147.32.84.170", "147.32.84.134", "147.32.84.164"]
     
+    #All hosts, both infected and normal from https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-51/
+    testHosts = ["147.32.84.191", "147.32.84.192", "147.32.84.193", "147.32.84.204", "147.32.84.205", "147.32.84.206",
+                 "147.32.84.207", "147.32.84.208", "147.32.84.209", "147.32.84.170", "147.32.84.134", "147.32.84.164"]
     # Only collect data for these hosts
-    hosts = [infectedHost] + normalHosts
+    hosts = [infectedHost] + normalHosts + testHosts
     
     # Create dictonaries with a list for each of the hosts
     flow_lists = {key: [] for key in hosts}
     flow_lists_bins = {key: [] for key in hosts}
-    
+    test_lists_bins = {key: [] for key in hosts}
     ah = open(src, 'r')
     
     # Possible flags:
@@ -163,4 +166,12 @@ if __name__ == "__main__":
     })
     df_legitimate.to_pickle("discretised_dataframe_legitimate")
     
-    #list_flow_codes_binned_host1
+    
+    #For each test host, save the discretised dataframe onto a file which will be used in botnet_profiling.py
+    for testHost in testHosts:
+        test_codes_bins = flow_lists_bins[testHost]
+    
+        df_legitimate = pd.DataFrame({
+                'code_discretized': test_codes_bins
+                })
+        df_legitimate.to_pickle("discretised_dataframe_test"+testHost)
