@@ -32,8 +32,8 @@ def compute_top_10_error(real, estimation):
 
 if __name__ == "__main__":
     
-    h = [5,10,15,20,30,40]
-    w = [50,100,200,300,500,600,700]
+    h = [5,10,15,20,25,30,35,40]
+    w = [20,25,30,35,40,45,50,55,60]
     for height in h:
         for width in w:
             ip_dict = {}

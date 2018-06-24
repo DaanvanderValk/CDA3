@@ -32,8 +32,8 @@ def compute_top_10_error(real, estimation):
     return error
 
 if __name__ == "__main__":
-    h = [20]
-    w = [700]
+    h = [15]
+    w = [55]
     for height in h:
         for width in w:
             ip_dict = {}
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             print ("Real values")
             for i in range(10):
                 print("{}: {} occurances".format(ip_frequencies_real[i][1], ip_frequencies_real[i][0]))
-            print ("Hashed values")    
+            print ("Top 10 ips with occurrences as per sketching task")    
             for i in range(10):    
                 print("{}: {} occurances".format(ip_frequencies_hash[i][1], ip_frequencies_hash[i][0]))
             
