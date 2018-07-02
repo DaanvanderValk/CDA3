@@ -17,7 +17,6 @@ def increase_dict_counter(dictionary, key):
     else:
         dictionary[key] = 1
 
-
 if __name__ == "__main__":
     src = '../Data/capture20110818.pcap.netflow.labeled'
 #    There are several infected hosts in this system:
@@ -37,6 +36,8 @@ if __name__ == "__main__":
 #    - 147.32.84.164
 #    (servers are excluded, see:)
 #    https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-51/
+    
+    infected_host_addr = '147.32.84.165'
     
     ah = open(src, 'r')
     
@@ -68,31 +69,8 @@ if __name__ == "__main__":
      "NRS", "MHR", "UR", "NNA", "MRP", "TRC", "DCE", "SKP", "DNP", "URPRE", "URS", "URNU", "URCUT",
      "URISO", "URHTOS", "URHU", "FRAC_", "SRC_", "RPA_FRPA"]
     
-    space = len(discrete_protocols) * len(discrete_flags)
-    # Ideally, the number of bins should be a multiple of 3, to nicely separate the 3 protocols
-    number_of_bins = 15
-    
-    # Keep a list of the flow codes in a dict for each of the mentoined hosts
-    list_hosts = {
-            # Infected hosts
-            "147.32.84.165": True,
-            "147.32.84.191": True,
-            "147.32.84.192": True,
-            "147.32.84.193": True,
-            "147.32.84.204": True,
-            "147.32.84.205": True,
-            "147.32.84.206": True,
-            "147.32.84.207": True,
-            "147.32.84.208": True,
-            "147.32.84.209": True,
-            # Normal hosts
-            "147.32.84.170": False,
-            "147.32.84.134": False,
-            "147.32.84.164": False
-        }
+    # Keep a list of the flow codes
     list_flow_codes = []
-    dict_flow_lists = {key: [] for key in list_hosts.keys()}
-    dict_flow_lists_bins = {key: [] for key in list_hosts.keys()}
     
     
     code = 0
@@ -123,17 +101,12 @@ if __name__ == "__main__":
 #        if line_array[12] == "Background":
 #            continue
         
-        
         source_ip = line_array[4].split(':')[0]
         dest_ip = line_array[6].split(':')[0]
         
         # We are interested in the infected host: which addresses does it connect to?
-        # Skip lines that are not from/to this hosts
-        if source_ip in list_hosts.keys():
-            host = source_ip
-        elif dest_ip in list_hosts.keys():
-            host = dest_ip
-        else:
+        # Skip lines that are not from/to this host
+        if source_ip != infected_host_addr and dest_ip != infected_host_addr:
             continue
         
         # Append to lists, to be combined into dataframe
@@ -148,16 +121,14 @@ if __name__ == "__main__":
         # This is equivalent to Algorithm 1 (p. 311) in
         # 'Learning Behavioral Fingerprints From Netflows Using Timed Automata'
         code = discrete_protocols.index(protocol) * initialSpaceDevM1 + discrete_flags.index(flags)
-        dict_flow_lists[host].append(code)
-        
-        # Discretize this encoding even further, into the number of bins defined before
-        dict_flow_lists_bins[host].append(np.floor(float(code)/space*number_of_bins))
-        
-        counter +=1
-        
-        
+        list_flow_codes.append(code)
+#        
+#        counter +=1
+#        if counter > 25:
+#            break
+#        
     
-    print("Done reading data: {} records included.".format(counter))
+    print("Done reading data.")
     
     
     # Create dataframe of the collected data
@@ -167,30 +138,39 @@ if __name__ == "__main__":
      'code': list_flow_codes
     })
     
-        
+    
+    df['code'].plot(figsize=(14,5))
+    
+    
+    
     # VISUALIZATION
-    figsize = (7, 2.5)
+    
+    # Dimensions of the heatmaps; useful for tweaking.
+    x_size = 14
+    y_size = 2
+    
+    # Select the features to be plotted here
+    # The features should be categorical, as their unique values are used
+    feature1 = 'protocol'
+    feature2 = 'flags'
+    
+    # Save the heatmaps to SVG files?
     saveToFiles = False
     
-    # The hosts shown in the report:
-    # Infected: 147.32.84.165
-    # Normal:   147.32.84.164
+    # If the heatmaps should be saved, use current datetime to avoid overwriting existing files
+    preFileName = datetime.datetime.now().strftime("%d-%m-%y %H.%M.%S")
     
-    for host in list_hosts.keys():
-        plt.figure(figsize=figsize)
-        #plt.suptitle("Data for host {} which is {}infected".format(host, "" if list_hosts[host] else "not "))
-        plt.plot(dict_flow_lists[host], color = "lightcoral" if list_hosts[host] else "lightgreen")
-        plt.ylabel("Flow encoding")
-        plt.xlabel("Packets for this host")
-        
-        if saveToFiles:
-            plt.savefig(("botnet" if list_hosts[host] else "normal") + "_flow_encoding_"+ host +".svg", bbox_inches='tight')
-        
-        plt.figure(figsize=figsize)
-        #plt.suptitle("Data for host {} which is {}infected (discretized)".format(host, "" if list_hosts[host] else "not "))
-        plt.plot(dict_flow_lists_bins[host], color = "red" if list_hosts[host] else "green")
-        plt.ylabel("Flow encoding (discretized)")
-        plt.xlabel("Packets for this host")
-        
-        if saveToFiles:
-            plt.savefig(("botnet" if list_hosts[host] else "normal") + "_flow_encoding_"+ host +"_discretized.svg", bbox_inches='tight')
+    
+    # Only select items we need
+    df = df[['label', feature1, feature2]]
+    
+    # Drop empty values
+    df = df.dropna()
+    
+    # Show which distinct values the selected features can take
+    feature1_values = df[feature1].unique()
+    feature2_values = df[feature2].unique()
+    
+    print(feature1, "values:", feature1_values)
+    print(feature2, "values:", feature2_values)
+    
